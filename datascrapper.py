@@ -45,7 +45,7 @@ def main(person):
         # connection is not autocommit by default. So you must commit to save
         # your changes.
         connection.commit()
-
+        
 def executeSQLCommand(cursor, sSql):
     ### call the database
     
@@ -80,7 +80,7 @@ def createRecord(cursor, release, person, artist, role, bUpdate = False):
         catalogno = "''"
         
         
-    #print(str(release))
+    print("done " + str(release['id']))
     
     if (bUpdate):
         sSql = "UPDATE `releases` SET `TITLE`=" + repr(release['title']) + ",`ARTIST`=" + repr(artist) + ",`YEAR`=" + str(year)
@@ -105,7 +105,8 @@ def updateRecord(cursor, release, person, artist, role, rExistingEntry):
     if(pytz.utc.localize(rExistingEntry['LASTUPDATEDB'])) <= dateutil.parser.isoparse(release['date_changed']):
        #Update record - assuming the tracklisting hasn't changed.
        createRecord(cursor, release, person, artist,role,True)
-    
+    else:
+        print("skipping - already up to date " + str(release['id']))
     
 def doReleaseThingies(cursor, person, artist, role, releaseid)  :
     #Check if it already exists in db
