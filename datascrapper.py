@@ -10,7 +10,7 @@ import pymysql
 import pymysql.cursors
 import pytz
     
-def main(person):
+def main(person, iStartAtPage = 0):
     #Person is their discogs artist ID
     
     connection = pymysql.connect(host='localhost',
@@ -23,8 +23,14 @@ def main(person):
         with connection.cursor() as cursor:
      
             url = "https://api.discogs.com/artists/" + str(person) + "/releases"
+            if (iStartAtPage == 0):
+                iStartAtPage = 2 #will do page 1 anyway, so loop needs to start at 2
+                startUrl = url
+            else:
+                startUrl = url+ "?page=" + str(iStartAtPage)
             
             #First call
+            print(startUrl)
             data = callDiscogs(url)
             parseResults(cursor, data, person, connection)
             
@@ -32,14 +38,15 @@ def main(person):
             pagination = data['pagination']
             iPages = pagination['pages']
     
-            iPage = 2
+            iPage = iStartAtPage
             while iPage <= iPages:
                 print("page" + str(iPage))
                 pageUrl = url+ "?page=" + str(iPage)
+                print(pageUrl)
                 data = callDiscogs(pageUrl)
                 parseResults(cursor, data, person, connection)
     
-                ++iPage
+                iPage = iPage + 1
               
         
         # connection is not autocommit by default. So you must commit to save
@@ -163,6 +170,8 @@ def parseResults(cursor, data, person, connection):
     connection.commit()
     
 def searchMasters(cursor, releaseFromArtist, person, connection, pagination):
+    
+    print("looking up master record " + str(releaseFromArtist['id']))
     
     url = "https://api.discogs.com/masters/" + str(releaseFromArtist['id']) + "/versions"
     versions = callDiscogs(url)
