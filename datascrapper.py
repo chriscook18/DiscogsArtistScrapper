@@ -24,7 +24,7 @@ def main(person, iStartAtPage = 0):
      
             url = "https://api.discogs.com/artists/" + str(person) + "/releases"
             if (iStartAtPage == 0):
-                iStartAtPage = 2 #will do page 1 anyway, so loop needs to start at 2
+                iStartAtPage = 1 
                 startUrl = url
             else:
                 startUrl = url+ "?page=" + str(iStartAtPage)
@@ -38,7 +38,7 @@ def main(person, iStartAtPage = 0):
             pagination = data['pagination']
             iPages = pagination['pages']
     
-            iPage = iStartAtPage
+            iPage = iStartAtPage + 1
             while iPage <= iPages:
                 print("page" + str(iPage))
                 pageUrl = url+ "?page=" + str(iPage)
@@ -112,8 +112,8 @@ def updateRecord(cursor, release, person, artist, role, rExistingEntry):
     if(pytz.utc.localize(rExistingEntry['LASTUPDATEDB'])) <= dateutil.parser.isoparse(release['date_changed']):
        #Update record - assuming the tracklisting hasn't changed.
        createRecord(cursor, release, person, artist,role,True)
-    else:
-        print("skipping - already up to date " + str(release['id']))
+   # else:
+        #print("skipping - already up to date " + str(release['id']))
     
 def doReleaseThingies(cursor, person, artist, role, releaseid)  :
     #Check if it already exists in db
@@ -210,6 +210,4 @@ def callDiscogs(url):
     return data
 
 if __name__ == '__main__':
-    main(100702)
-    
-    
+    main(2536711, 0)
